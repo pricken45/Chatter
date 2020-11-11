@@ -3,14 +3,17 @@ import threading
 
 
 class Server:
-    server: socket.socket = None
+    server:socket.socket = None
     connections = []
 
-    def __init__(self, ip, port):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind((ip, port))
-        self.server.listen(5)
+    def __init__(self):
+        print("Server is starting at 192.168.0.60:9586...")
 
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.server.bind(('192.168.0.60', 9586))
+        self.server.listen(3)
+        
     def handler(self, c, a):
         while True:
             data = c.recv(2048)
@@ -21,15 +24,19 @@ class Server:
                 self.connections.remove(c)
                 break
 
+
     def run(self):
         while True:
-            connection, address = self.server.accept()
+            c, a = self.server.accept()
 
-            connThread = threading.Thread(target=self.handler, args=(connection, address))
-            connThread.start()
-            self.connections.append(connection)
-            print(connection)
+            cThread = threading.Thread(target=self.handler, args=(c, a))
+            cThread.start()
+            
+            self.connections.append(c)
+            print(c)
 
 
-server = Server('Your ip', 2449)
+
+server = Server()
 server.run()
+
