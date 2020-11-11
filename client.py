@@ -1,13 +1,29 @@
 import socket
 import threading
 
+
 class Client:
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    userName = input("Username: ")
 
-    def __init__(self):
-        self.server.connect(('192.168.0.60', 9586))
+    def sendMsg(self):
+        while True:
+            self.server.send(bytes(f"[{self.userName}] " + input(""), 'utf-8'))
 
-        self.server.send(bytes("Hello", 'utf-8'))
+    def __init__(self, ip, port):
+        self.server.connect((ip, port))
+
+        iThread = threading.Thread(target=self.sendMsg)
+        iThread.daemon = True
+        iThread.start()
 
 
-cl = Client()
+        while True:
+            data = self.server.recv(2048)
+
+            if not data:
+                break
+            print(str(data, 'utf-8'))
+
+
+client = Client(input('Ip: '), int(input('Port: ')))
